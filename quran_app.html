@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق الورد اليومي في رمضان</title>
+<style>
+body {
+font-family: 'Arial', sans-serif;
+direction: rtl;
+text-align: center;
+margin: 0;
+padding: 0;
+background-color: #f4f4f4;
+}
+
+header {
+background-color: #007BFF;
+color: white;
+padding: 10px 0;
+}
+
+.container {
+padding: 20px;
+}
+
+.section {
+margin-bottom: 20px;
+background-color: white;
+padding: 15px;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.section h2 {
+margin-top: 0;
+}
+
+.input-group {
+margin-bottom: 10px;
+}
+
+.input-group label {
+display: block;
+margin-bottom: 5px;
+}
+
+.input-group input,
+.input-group select {
+width: 100%;
+padding: 8px;
+box-sizing: border-box;
+}
+
+.quran-section {
+font-size: 18px;
+line-height: 1.6;
+direction: rtl;
+text-align: right;
+font-family: 'Amiri', serif;
+}
+
+.prayer-times {
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+.prayer-times table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 10px;
+}
+
+.prayer-times table th,
+.prayer-times table td {
+border: 1px solid #ddd;
+padding: 8px;
+text-align: center;
+}
+
+.daily-dhikr {
+font-size: 16px;
+line-height: 1.5;
+}
+</style></head>
+
+<body>
+<header>
+<h1>تطبيق الورد اليومي في رمضان</h1>
+</header>
+
+<div class="container">
+<!-- Section for selecting Quran reading preferences -->
+<div class="section">
+<h2>إعدادات قراءة القرآن الكريم</h2>
+<div class="input-group">
+<label for="day">اختر يوم الصيام:</label>
+<input type="number" id="day" min="1" max="30" value="1">
+</div>
+<div class="input-group">
+<label for="juzCount">عدد الأحزاب التي ترغب في قراءتها خلال الشهر:</label>
+<select id="juzCount">
+<option value="1">1 جزء</option>
+<option value="2">2 أجزاء</option>
+<option value="3">3 أجزاء</option>
+<option value="4">4 أجزاء</option>
+</select>
+</div>
+<button onclick="calculateReadingPlan()">احسب خطة القراءة</button>
+</div>
+
+<!-- Section for displaying Quran reading plan -->
+<div class="section quran-section" id="readingPlan">
+<h2>خطة الورد اليومي</h2>
+<p id="readingPlanDetails">سيتم عرض الخطة هنا.</p>
+</div>
+
+<!-- Section for prayer times -->
+<div class="section prayer-times">
+<h2>أوقات الصلاة</h2>
+<div class="input-group">
+<label for="country">اختر الدولة:</label>
+<input type="text" id="country" placeholder="مثال: المغرب">
+</div>
+<div class="input-group">
+<label for="city">اختر المدينة:</label>
+<input type="text" id="city" placeholder="مثال: الدار البيضاء">
+</div>
+<button onclick="fetchPrayerTimes()">احصل على أوقات الصلاة</button>
+<table id="prayerTimesTable">
+<thead>
+<tr>
+<th>الصلاة</th>
+<th>التوقيت</th>
+</tr>
+</thead>
+<tbody id="prayerTimesBody"></tbody>
+</table>
+</div>
+
+<!-- Section for daily dhikr -->
+<div class="section daily-dhikr">
+<h2>الأذكار اليومية</h2>
+<ul id="dailyDhikrList">
+<li>سبحان الله وبحمده عدد خلقه، ورضا نفسه، وزنة عرشه، ومداد كلماته.</li>
+<li>لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير.</li>
+<li>اللهم صلي وسلم على سيدنا محمد وعلى آله وصحبه أجمعين.</li>
+</ul>
+</div>
+</div>
+
+<script>
+// Function to calculate the Quran reading plan
+function calculateReadingPlan() {
+const day = parseInt(document.getElementById('day').value);
+const juzCount = parseInt(document.getElementById('juzCount').value);
+
+if (isNaN(day) || day < 1 || day > 30) {
+alert('يرجى اختيار يوم صحيح بين 1 و30.');
+return;
+}
+
+if (isNaN(juzCount) || juzCount < 1 || juzCount > 4) {
+alert('يرجى اختيار عدد أحزاب صحيح.');
+return;
+}
+
+const totalDays = 30;
+const partsPerDay = juzCount / totalDays * 5; // Divide into 5 prayers
+
+let readingPlanDetails = `يوم ${day}:`;
+
+for (let i = 1; i <= 5; i++) {
+const startPart = Math.ceil((day - 1) * partsPerDay + (i - 1) * (partsPerDay / 5) + 1);
+const endPart = Math.ceil((day - 1) * partsPerDay + (i) * (partsPerDay / 5));
+readingPlanDetails += `\n- بعد الصلاة رقم ${i}: قراءة من الجزء ${startPart} إلى الجزء ${endPart}`;
+}
+
+document.getElementById('readingPlanDetails').innerText = readingPlanDetails;
+}
+
+// Function to fetch prayer times (mock data for demonstration purposes)
+function fetchPrayerTimes() {
+const country = document.getElementById('country').value;
+const city = document.getElementById('city').value;
+
+if (!country || !city) {
+alert('يرجى إدخال اسم الدولة والمدينة.');
+return;
+}
+
+const prayerTimes = {
+"الفجر": "05:00",
+"الظهر": "12:30",
+"العصر": "15:45",
+"المغرب": "18:15",
+"العشاء": "19:30"
+};
+
+const prayerTimesBody = document.getElementById('prayerTimesBody');
+prayerTimesBody.innerHTML = '';
+
+for (const [prayer, time] of Object.entries(prayerTimes)) {
+const row = document.createElement('tr');
+const prayerCell = document.createElement('td');
+const timeCell = document.createElement('td');
+
+prayerCell.textContent = prayer;
+timeCell.textContent = time;
+
+row.appendChild(prayerCell);
+row.appendChild(timeCell);
+prayerTimesBody.appendChild(row);
+}
+}
+</script></body>
+
+</html>
